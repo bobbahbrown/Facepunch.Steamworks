@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading;
 using Steamworks.Data;
@@ -48,9 +49,6 @@ namespace Steamworks
 			}
 		}
 
-		[UnmanagedFunctionPointer( CallingConvention.Cdecl )]
-		private delegate void FreeFn( NetMsg* msg );
-
 		private static readonly Stack<ReferenceCounter> ReferenceCounterPool =
 			new Stack<ReferenceCounter>( 1024 );
 
@@ -59,8 +57,6 @@ namespace Steamworks
 
 		private static readonly Dictionary<IntPtr, ReferenceCounter> ReferenceCounters =
 			new Dictionary<IntPtr, ReferenceCounter>( 1024 );
-
-		public static readonly IntPtr FreeFunctionPointer = Marshal.GetFunctionPointerForDelegate<FreeFn>( Free );
 
 		public static IntPtr Get( int size, int referenceCount )
 		{
@@ -86,9 +82,10 @@ namespace Steamworks
 			return ptr;
 		}
 		
-		[MonoPInvokeCallback]
-		private static void Free( NetMsg* msg )
+		[UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
+		public static void Free( IntPtr msgPtr )
 		{
+			var msg = (NetMsg*)msgPtr.ToPointer();
 			var ptr = msg->DataPtr;
 
 			lock ( ReferenceCounters )

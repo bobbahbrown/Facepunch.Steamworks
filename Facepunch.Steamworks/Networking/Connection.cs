@@ -80,7 +80,7 @@ namespace Steamworks.Data
             message->Flags = sendType;
             message->DataPtr = copyPtr;
 			message->DataSize = size;
-            message->FreeDataPtr = BufferManager.FreeFunctionPointer;
+            message->FreeDataPtr = &BufferManager.Free;
 
 			long messageNumber = 0;
 			SteamNetworkingSockets.Internal.SendMessages( 1, &message, &messageNumber );

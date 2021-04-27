@@ -195,7 +195,7 @@ namespace Steamworks
 				messages[i]->Flags = sendType;
 				messages[i]->DataPtr = copyPtr;
 				messages[i]->DataSize = size;
-				messages[i]->FreeDataPtr = BufferManager.FreeFunctionPointer;
+				messages[i]->FreeDataPtr = &BufferManager.Free;
 			}
 
 			SteamNetworkingSockets.Internal.SendMessages( connectionCount, messages, messageNumberOrResults );
